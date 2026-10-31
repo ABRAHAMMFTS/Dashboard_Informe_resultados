@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Gloria de Dios · ¿Por qué se fueron los clientes?</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } };
+  </script>
+  <style type="text/tailwindcss">
+    @layer components {
+      .card       { @apply bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.04)] min-w-0 break-words; }
+      .kpi-card   { @apply card p-5 flex flex-col h-full; }
+      .kpi-accent { @apply block w-10 h-1 rounded-full mb-3; }
+      .eyebrow    { @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500; }
+      .kpi-value  { @apply text-4xl font-semibold tracking-tight tabular-nums mt-1.5 leading-none; }
+      .kpi-text   { @apply text-[13px] leading-relaxed text-slate-600 mt-2.5; }
+      .panel      { @apply card p-5 flex flex-col h-full; }
+      .card-title { @apply text-base font-semibold text-slate-900; }
+      .card-sub   { @apply text-xs leading-relaxed text-slate-500 mt-0.5; }
+      .chart-box  { @apply relative w-full h-[200px] mt-3 shrink-0; }
+      .note       { @apply text-[13px] leading-relaxed text-slate-600 border-t border-slate-100 pt-3 mt-auto; }
+      .step-num   { @apply shrink-0 w-7 h-7 rounded-full bg-slate-900 text-white text-xs font-semibold flex items-center justify-center; }
+      .step-title { @apply text-sm font-semibold; }
+      .step-text  { @apply text-[13px] leading-relaxed text-slate-600 mt-0.5; }
+      .legend-dot { @apply w-2 h-2 rounded-full inline-block shrink-0; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 antialiased">
+<div class="min-h-screen max-w-[1440px] mx-auto flex flex-col gap-4 px-5 lg:px-8 py-5">
+
+  <!-- ENCABEZADO -->
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="eyebrow">Tienda La Gloria de Dios · Conjunto Territorio Mío</p>
+      <h1 class="text-2xl font-semibold tracking-tight mt-1">¿Por qué los vecinos dejaron de comprar?</h1>
+    </div>
+    <div class="flex flex-wrap items-center gap-2.5">
+      <a href="https://docs.google.com/forms/d/1Z3cR3EJx9MJaMEYzaw5zOthaUEqulaAJ-0K_XXvQoro/edit?usp=sharing_eil_se_dm&ts=6ae36fd6"
+         target="_blank" rel="noopener noreferrer"
+         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-100 hover:bg-emerald-200/80 text-emerald-900 border border-emerald-200 text-xs font-semibold tracking-wide shadow-sm transition-all duration-200 active:scale-[0.98]">
+        <span>Ver respuestas</span>
+      </a>
+      <a href="Dashboard_La_Gloria_de_Dios_Senior_DS.html"
+         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold tracking-wide shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98]">
+        <span>Ver sorpresas</span>
+        <svg class="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- MENSAJE PRINCIPAL -->
+  <section class="card bg-slate-900 border-slate-900 text-white p-6 grid lg:grid-cols-12 gap-6 items-center">
+    <div class="lg:col-span-7">
+      <h2 class="text-xl lg:text-2xl font-semibold leading-snug">La gente conoce la tienda. Lo que la aleja es la fila.</h2>
+      <p class="text-sm text-slate-300 leading-relaxed mt-2 max-w-2xl">
+        El <span data-metric="knowRate" data-format="pct"></span> del conjunto le ha comprado alguna vez a la señora Gloria,
+        así que darse a conocer no es el problema. El problema es que de cada 10 que le compraban,
+        <strong class="text-white"><span data-metric="churnRate" data-format="per10"></span> ya se fueron</strong>
+        a las tiendas nuevas de las torres 2 y 3. Y no fue por precio. A la hora de escoger tienda, la gente
+        quiere que la atiendan rápido y bien, y eso es justo lo que falla cuando ella está sola en el mostrador
+        recibiendo proveedores en plena hora pico.
+      </p>
+    </div>
+
+    <div class="lg:col-span-5">
+      <p class="text-xs text-slate-400 mb-3">Así están hoy los <span data-metric="total"></span> vecinos encuestados</p>
+      <div class="flex h-3 rounded-full overflow-hidden bg-white/10">
+        <div id="barActive" class="bg-emerald-400 transition-all duration-700"></div>
+        <div id="barLost" class="bg-rose-500 transition-all duration-700"></div>
+        <div id="barNever" class="bg-slate-500 transition-all duration-700"></div>
+      </div>
+      <dl class="grid grid-cols-3 gap-3 mt-4">
+        <div>
+          <dt class="flex items-center gap-1.5 text-xs text-slate-400"><span class="legend-dot bg-emerald-400"></span>Siguen comprando</dt>
+          <dd class="text-2xl font-semibold tabular-nums mt-1" data-metric="active"></dd>
+        </div>
+        <div>
+          <dt class="flex items-center gap-1.5 text-xs text-slate-400"><span class="legend-dot bg-rose-500"></span>Se fueron</dt>
+          <dd class="text-2xl font-semibold tabular-nums mt-1" data-metric="lost"></dd>
+        </div>
+        <div>
+          <dt class="flex items-center gap-1.5 text-xs text-slate-400"><span class="legend-dot bg-slate-500"></span>Nunca han comprado</dt>
+          <dd class="text-2xl font-semibold tabular-nums mt-1" data-metric="never"></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- CUATRO CIFRAS CLAVE -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <article class="card p-5 border-t-4 border-t-rose-500">
+      <p class="eyebrow">Clientes perdidos</p>
+      <p class="kpi-value text-rose-600" data-metric="churnRate" data-format="pct"></p>
+      <p class="kpi-text">de quienes alguna vez le compraron ya no vuelven
+        (<span data-metric="lost"></span> de <span data-metric="triers"></span>).</p>
+    </article>
+
+    <article class="card p-5 border-t-4 border-t-amber-500">
+      <p class="eyebrow">Compras a medias</p>
+      <p class="kpi-value text-amber-600" data-metric="abandonRate" data-format="pct"></p>
+      <p class="kpi-text">ha dejado una compra tirada por no esperar en la fila
+        (<span data-metric="abandon"></span> vecinos).</p>
+    </article>
+
+    <article class="card p-5 border-t-4 border-t-slate-800">
+      <p class="eyebrow">El fiado no los retiene</p>
+      <p class="kpi-value" data-metric="fiadoLostRate" data-format="pct"></p>
+      <p class="kpi-text">de los que agradecen el fiado igual se fueron. Cuando deben en el cuaderno,
+        les da pena llegar con efectivo y prefieren comprar en otra tienda.</p>
+    </article>
+
+    <article class="card p-5 border-t-4 border-t-slate-800">
+      <p class="eyebrow">Ni sus propios vecinos</p>
+      <p class="kpi-value" data-metric="homeLostRate" data-format="pct"></p>
+      <p class="kpi-text">de la Torre 1, donde queda la tienda, pasa por la puerta y se va a comprar
+        a otra torre (<span data-metric="homeLost"></span> de <span data-metric="homeTotal"></span>).</p>
+    </article>
+  </section>
+
+  <!-- GRÁFICOS Y ACCIONES -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:flex-1 lg:min-h-0">
+    <article class="card p-5 flex flex-col min-h-0">
+      <h3 class="card-title">Qué pesa al escoger tienda</h3>
+      <p class="card-sub">Porcentaje de vecinos según lo que más les importa</p>
+      <div class="relative flex-1 min-h-[180px] mt-3"><canvas id="chartDrivers"></canvas></div>
+      <p class="note">Hasta los que dicen que el precio es lo más importante terminan escogiendo por rapidez:
+        <strong class="text-slate-900"><span data-metric="priceButSpeed"></span> de <span data-metric="priceFirst"></span></strong>.</p>
+    </article>
+
+    <article class="card p-5 flex flex-col min-h-0">
+      <h3 class="card-title">Quién sigue comprando, por edad</h3>
+      <p class="card-sub">Porcentaje de cada grupo que todavía le compra a la tienda</p>
+      <div class="relative flex-1 min-h-[180px] mt-3"><canvas id="chartAge"></canvas></div>
+      <p class="note">De los mayores de 36 solo quedan
+        <strong class="text-slate-900"><span data-metric="seniorActive"></span> de <span data-metric="seniorTotal"></span></strong>.
+        Ellos compran varias cosas para el almuerzo, y esa compra larga es la que más sufre con la espera.</p>
+    </article>
+
+    <article class="card p-5 flex flex-col min-h-0">
+      <h3 class="card-title">Qué hacer primero</h3>
+      <p class="card-sub">Tres cambios que atacan lo que más molesta</p>
+      <ol class="mt-4 space-y-4 flex-1">
+        <li class="flex gap-3">
+          <span class="shrink-0 w-7 h-7 rounded-full bg-slate-900 text-white text-xs font-semibold flex items-center justify-center">1</span>
+          <div>
+            <p class="text-sm font-semibold">Despejar las horas pico</p>
+            <p class="text-[13px] leading-snug text-slate-600 mt-0.5">Cero proveedores de 6:30 a 8:30 a.m. y de 11:30 a.m. a 1:30 p.m.,
+              y alguien que ayude en caja a esas horas. El <span data-metric="longWaitRate" data-format="pct"></span> siente que la espera es larga.</p>
+          </div>
+        </li>
+        <li class="flex gap-3">
+          <span class="shrink-0 w-7 h-7 rounded-full bg-slate-900 text-white text-xs font-semibold flex items-center justify-center">2</span>
+          <div>
+            <p class="text-sm font-semibold">Vender por porciones</p>
+            <p class="text-[13px] leading-snug text-slate-600 mt-0.5">Bolsitas y combos para el almuerzo. El
+              <span data-metric="portionRate" data-format="pct"></span> no siente que las cantidades que vende se ajusten a su bolsillo.</p>
+          </div>
+        </li>
+        <li class="flex gap-3">
+          <span class="shrink-0 w-7 h-7 rounded-full bg-slate-900 text-white text-xs font-semibold flex items-center justify-center">3</span>
+          <div>
+            <p class="text-sm font-semibold">Mostrador despejado y precios a la vista</p>
+            <p class="text-[13px] leading-snug text-slate-600 mt-0.5">El <span data-metric="tidierRate" data-format="pct"></span>
+              ve más ordenadas las tiendas nuevas. Sin precios visibles, todo parece más caro de lo que es.</p>
+          </div>
+        </li>
+      </ol>
+    </article>
+  </section>
+</div>
+
+<script>
+  const SURVEY_DATA = [
+      {"id": "ENC-001", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, actualmente", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "En desacuerdo", "p8": "No sé", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "En desacuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-002", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Peores", "p15": "Precios y fiado", "score": 1.5},
+      {"id": "ENC-003", "p1": "Torre 3", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "Más o menos", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-004", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "Más o menos", "p6": "No", "p7": "En desacuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "Más o menos", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.75},
+      {"id": "ENC-005", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "De acuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Orden y limpieza", "score": 2.5},
+      {"id": "ENC-006", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-007", "p1": "Torre 3", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "Iguales", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.5},
+      {"id": "ENC-008", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "De acuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Peores", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-009", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, actualmente", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "De acuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-010", "p1": "Torre 3", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "De acuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.75},
+      {"id": "ENC-011", "p1": "Torre 1", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-012", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Iguales", "p9": "De acuerdo", "p10": "En desacuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.25},
+      {"id": "ENC-013", "p1": "Torre 2", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "En desacuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Orden y limpieza", "score": 1.75},
+      {"id": "ENC-014", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.75},
+      {"id": "ENC-015", "p1": "Torre 3", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "De acuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 2.0},
+      {"id": "ENC-016", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "Más o menos", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "Iguales", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-017", "p1": "Torre 2", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "Más o menos", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "Más o menos", "p14": "Peores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-018", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "Más o menos", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "No sé", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-019", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "Más o menos", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Orden y limpieza", "score": 1.75},
+      {"id": "ENC-020", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "Más o menos", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "Más o menos", "p12": "En desacuerdo", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-021", "p1": "Torre 3", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.5},
+      {"id": "ENC-022", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "De acuerdo", "p13": "Más o menos", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 2.25},
+      {"id": "ENC-023", "p1": "Torre 1", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Orden y limpieza", "score": 1.5},
+      {"id": "ENC-024", "p1": "Torre 2", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Peores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.25},
+      {"id": "ENC-025", "p1": "Torre 3", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "No, nunca", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "Iguales", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.5},
+      {"id": "ENC-026", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "No sé", "p9": "Más o menos", "p10": "Más o menos", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-027", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "Más o menos", "p11": "En desacuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Orden y limpieza", "score": 1.75},
+      {"id": "ENC-028", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "Iguales", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "Más o menos", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-029", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, actualmente", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Orden y limpieza", "score": 2.0},
+      {"id": "ENC-030", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "En desacuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Orden y limpieza", "score": 1.75},
+      {"id": "ENC-031", "p1": "Torre 3", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "No, nunca", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Peores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-032", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "De acuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "No sé", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "En desacuerdo", "p13": "En desacuerdo", "p14": "No sé", "p15": "Precios y fiado", "score": 2.0},
+      {"id": "ENC-033", "p1": "Torre 1", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "No sé", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-034", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Iguales", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-035", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Iguales", "p9": "Más o menos", "p10": "Más o menos", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-036", "p1": "Otra torre", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "No", "p7": "En desacuerdo", "p8": "Iguales", "p9": "Más o menos", "p10": "Más o menos", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.5},
+      {"id": "ENC-037", "p1": "Torre 1", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, actualmente", "p4": "De acuerdo", "p5": "Más o menos", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "No sé", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Peores", "p15": "Trato y rapidez de atención", "score": 2.25},
+      {"id": "ENC-038", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "Más o menos", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.75},
+      {"id": "ENC-039", "p1": "Torre 3", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "Más o menos", "p6": "Sí", "p7": "Más o menos", "p8": "No sé", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-040", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "De acuerdo", "p6": "Sí", "p7": "En desacuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-041", "p1": "Otra torre", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.5},
+      {"id": "ENC-042", "p1": "Otra torre", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "Más o menos", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "De acuerdo", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-043", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "Peores", "p9": "Más o menos", "p10": "Más o menos", "p11": "Más o menos", "p12": "De acuerdo", "p13": "Más o menos", "p14": "Mejores", "p15": "Precios y fiado", "score": 2.0},
+      {"id": "ENC-044", "p1": "Torre 3", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, actualmente", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "En desacuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Peores", "p15": "Precios y fiado", "score": 1.75},
+      {"id": "ENC-045", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.75},
+      {"id": "ENC-046", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "De acuerdo", "p5": "Más o menos", "p6": "Sí", "p7": "En desacuerdo", "p8": "Iguales", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 2.25},
+      {"id": "ENC-047", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "Más o menos", "p5": "De acuerdo", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "Iguales", "p9": "Más o menos", "p10": "Más o menos", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-048", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "Iguales", "p9": "Más o menos", "p10": "Más o menos", "p11": "Más o menos", "p12": "De acuerdo", "p13": "De acuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 2.25},
+      {"id": "ENC-049", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Iguales", "p15": "Precios y fiado", "score": 1.5},
+      {"id": "ENC-050", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-051", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "Más o menos", "p6": "No", "p7": "De acuerdo", "p8": "Iguales", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "Más o menos", "p14": "Mejores", "p15": "Precios y fiado", "score": 2.25},
+      {"id": "ENC-052", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "De acuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Iguales", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "Más o menos", "p14": "Iguales", "p15": "Orden y limpieza", "score": 1.75},
+      {"id": "ENC-053", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "De acuerdo", "p5": "Más o menos", "p6": "Sí", "p7": "En desacuerdo", "p8": "Iguales", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Orden y limpieza", "score": 2.25},
+      {"id": "ENC-054", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "De acuerdo", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.25},
+      {"id": "ENC-055", "p1": "Torre 1", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "Más o menos", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-056", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "Peores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-057", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.75},
+      {"id": "ENC-058", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Peores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-059", "p1": "Torre 1", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "Iguales", "p9": "En desacuerdo", "p10": "En desacuerdo", "p11": "Más o menos", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-060", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.25},
+      {"id": "ENC-061", "p1": "Otra torre", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.5},
+      {"id": "ENC-062", "p1": "Torre 2", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "No sé", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-063", "p1": "Torre 3", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "De acuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "De acuerdo", "p10": "En desacuerdo", "p11": "Más o menos", "p12": "En desacuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-064", "p1": "Torre 3", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "En desacuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Orden y limpieza", "score": 1.5},
+      {"id": "ENC-065", "p1": "Torre 1", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, actualmente", "p4": "Más o menos", "p5": "De acuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Peores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.5},
+      {"id": "ENC-066", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "Iguales", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.25},
+      {"id": "ENC-067", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "Más o menos", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "En desacuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 2.0},
+      {"id": "ENC-068", "p1": "Torre 2", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Peores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.25},
+      {"id": "ENC-069", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "Más o menos", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Orden y limpieza", "score": 2.25},
+      {"id": "ENC-070", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "No, nunca", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "Más o menos", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.5},
+      {"id": "ENC-071", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "No", "p7": "De acuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-072", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, actualmente", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "De acuerdo", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Peores", "p15": "Trato y rapidez de atención", "score": 1.25},
+      {"id": "ENC-073", "p1": "Torre 3", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "No, nunca", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "Iguales", "p9": "Más o menos", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "En desacuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.5},
+      {"id": "ENC-074", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "Más o menos", "p6": "No", "p7": "Más o menos", "p8": "Mejores", "p9": "De acuerdo", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "En desacuerdo", "p14": "No sé", "p15": "Trato y rapidez de atención", "score": 1.25},
+      {"id": "ENC-075", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Orden y limpieza", "score": 1.5},
+      {"id": "ENC-076", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Iguales", "p9": "De acuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Iguales", "p15": "Precios y fiado", "score": 1.75},
+      {"id": "ENC-077", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "No sé", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.5},
+      {"id": "ENC-078", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, actualmente", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "No", "p7": "En desacuerdo", "p8": "Mejores", "p9": "De acuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "De acuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 2.5},
+      {"id": "ENC-079", "p1": "Torre 3", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, actualmente", "p4": "En desacuerdo", "p5": "De acuerdo", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-080", "p1": "Torre 1", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "Peores", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-081", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.5},
+      {"id": "ENC-082", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "No sé", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-083", "p1": "Torre 3", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 2.25},
+      {"id": "ENC-084", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "En desacuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-085", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "Más o menos", "p6": "Sí", "p7": "Más o menos", "p8": "Iguales", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-086", "p1": "Torre 1", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "De acuerdo", "p13": "De acuerdo", "p14": "Peores", "p15": "Orden y limpieza", "score": 2.0},
+      {"id": "ENC-087", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "De acuerdo", "p8": "Iguales", "p9": "Más o menos", "p10": "Más o menos", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-088", "p1": "Torre 1", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "En desacuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "Más o menos", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Orden y limpieza", "score": 2.0},
+      {"id": "ENC-089", "p1": "Torre 1", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-090", "p1": "Torre 1", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "Más o menos", "p8": "Iguales", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "Más o menos", "p12": "En desacuerdo", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-091", "p1": "Torre 3", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "De acuerdo", "p6": "No", "p7": "De acuerdo", "p8": "Mejores", "p9": "De acuerdo", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.5},
+      {"id": "ENC-092", "p1": "Otra torre", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "No sé", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "Más o menos", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.25},
+      {"id": "ENC-093", "p1": "Torre 2", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "No, nunca", "p4": "Más o menos", "p5": "Más o menos", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.5},
+      {"id": "ENC-094", "p1": "Torre 1", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Iguales", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Orden y limpieza", "score": 2.0},
+      {"id": "ENC-095", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "De acuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Iguales", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 2.5},
+      {"id": "ENC-096", "p1": "Torre 1", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "No, nunca", "p4": "En desacuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "En desacuerdo", "p8": "Mejores", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-097", "p1": "Torre 1", "p2": "18 a 25", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "De acuerdo", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Iguales", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "Más o menos", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-098", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "De acuerdo", "p8": "Mejores", "p9": "Más o menos", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "Más o menos", "p13": "Más o menos", "p14": "Mejores", "p15": "Trato y rapidez de atención", "score": 1.75},
+      {"id": "ENC-099", "p1": "Torre 2", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "Sí", "p7": "Más o menos", "p8": "Mejores", "p9": "Más o menos", "p10": "En desacuerdo", "p11": "En desacuerdo", "p12": "Más o menos", "p13": "De acuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-100", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No", "p7": "En desacuerdo", "p8": "Mejores", "p9": "De acuerdo", "p10": "De acuerdo", "p11": "En desacuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Iguales", "p15": "Precios y fiado", "score": 1.75},
+      {"id": "ENC-101", "p1": "Torre 2", "p2": "Más de 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "En desacuerdo", "p6": "No he comprado allí", "p7": "De acuerdo", "p8": "No sé", "p9": "En desacuerdo", "p10": "De acuerdo", "p11": "De acuerdo", "p12": "De acuerdo", "p13": "En desacuerdo", "p14": "Mejores", "p15": "Precios y fiado", "score": 1.75},
+      {"id": "ENC-102", "p1": "Torre 2", "p2": "26 a 35", "seg": "Joven (18 a 35)", "p3": "Sí, actualmente", "p4": "De acuerdo", "p5": "Más o menos", "p6": "No he comprado allí", "p7": "Más o menos", "p8": "Iguales", "p9": "En desacuerdo", "p10": "Más o menos", "p11": "Más o menos", "p12": "Más o menos", "p13": "En desacuerdo", "p14": "Iguales", "p15": "Trato y rapidez de atención", "score": 2.0},
+      {"id": "ENC-103", "p1": "Torre 3", "p2": "36 a 50", "seg": "Adulto / Senior (36+)", "p3": "Sí, pero ya no compro", "p4": "Más o menos", "p5": "Más o menos", "p6": "No", "p7": "Más o menos", "p8": "Iguales", "p9": "Más o menos", "p10": "Más o menos", "p11": "De acuerdo", "p12": "En desacuerdo", "p13": "En desacuerdo", "p14": "Peores", "p15": "Orden y limpieza", "score": 1.5}
+  ];
+
+  const ANSWERS = {
+    active: 'Sí, actualmente',
+    lost: 'Sí, pero ya no compro',
+    never: 'No, nunca',
+    agree: 'De acuerdo',
+    disagree: 'En desacuerdo',
+    yes: 'Sí',
+    better: 'Mejores',
+    speed: 'Trato y rapidez de atención'
+  };
+
+  const SEGMENTS = { homeTower: 'Torre 1', senior: 'Adulto / Senior (36+)' };
+
+  const DRIVERS = [
+    { key: 'Trato y rapidez de atención', label: 'Buen trato y rapidez' },
+    { key: 'Precios y fiado', label: 'Precio y fiado' },
+    { key: 'Orden y limpieza', label: 'Orden y limpieza' }
+  ];
+
+  const AGE_GROUPS = [
+    { key: '18 a 25', label: '18 a 25' },
+    { key: '26 a 35', label: '26 a 35' },
+    { key: '36 a 50', label: '36 a 50' },
+    { key: 'Más de 50', label: 'Más de 50' }
+  ];
+
+  const PALETTE = {
+    ink: '#0F172A',
+    muted: '#64748B',
+    neutral: '#CBD5E1',
+    accent: '#4F46E5',
+    good: '#10B981',
+    bad: '#F43F5E',
+    grid: '#F1F5F9'
+  };
+
+  // ---------- Utilidades ----------
+  const is = (field, value) => row => row[field] === value;
+  const count = (rows, predicate) => rows.filter(predicate).length;
+  const ratio = (part, total) => (total > 0 ? part / total : 0);
+
+  const FORMATTERS = {
+    int: v => String(v),
+    pct: v => `${Math.round(v * 100)}%`,
+    per10: v => String(Math.round(v * 10))
+  };
+
+  // ---------- Métricas ----------
+  function statusMetrics(rows) {
+    const active = count(rows, is('p3', ANSWERS.active));
+    const lost = count(rows, is('p3', ANSWERS.lost));
+    const never = count(rows, is('p3', ANSWERS.never));
+    const triers = active + lost;
+    return {
+      total: rows.length, active, lost, never, triers,
+      knowRate: ratio(triers, rows.length),
+      churnRate: ratio(lost, triers),
+      retentionRate: ratio(active, rows.length)
+    };
+  }
+
+  function lostWithin(rows, field, value) {
+    const segment = rows.filter(is(field, value));
+    const lost = count(segment, is('p3', ANSWERS.lost));
+    return { size: segment.length, lost, rate: ratio(lost, segment.length) };
+  }
+
+  function frictionMetrics(rows) {
+    const abandon = count(rows, is('p6', ANSWERS.yes));
+    const fiado = lostWithin(rows, 'p10', ANSWERS.agree);
+    const home = lostWithin(rows, 'p1', SEGMENTS.homeTower);
+    return {
+      abandon, abandonRate: ratio(abandon, rows.length),
+      fiadoLostRate: fiado.rate,
+      homeTotal: home.size, homeLost: home.lost, homeLostRate: home.rate
+    };
+  }
+
+  function choiceMetrics(rows) {
+    const priceFirst = rows.filter(is('p11', ANSWERS.agree));
+    const seniors = rows.filter(is('seg', SEGMENTS.senior));
+    return {
+      priceFirst: priceFirst.length,
+      priceButSpeed: count(priceFirst, is('p15', ANSWERS.speed)),
+      seniorTotal: seniors.length,
+      seniorActive: count(seniors, is('p3', ANSWERS.active)),
+      longWaitRate: ratio(count(rows, is('p5', ANSWERS.disagree)), rows.length),
+      portionRate: ratio(count(rows, r => r.p9 !== ANSWERS.agree), rows.length),
+      tidierRate: ratio(count(rows, is('p14', ANSWERS.better)), rows.length)
+    };
+  }
+
+  function computeMetrics(rows) {
+    return { ...statusMetrics(rows), ...frictionMetrics(rows), ...choiceMetrics(rows) };
+  }
+
+  function driverShares(rows) {
+    return DRIVERS.map(d => ratio(count(rows, is('p15', d.key)), rows.length) * 100);
+  }
+
+  function retentionByAge(rows) {
+    return AGE_GROUPS.map(group => {
+      const segment = rows.filter(is('p2', group.key));
+      return ratio(count(segment, is('p3', ANSWERS.active)), segment.length) * 100;
+    });
+  }
+
+  // ---------- Render de textos ----------
+  function bindMetrics(metrics) {
+    document.querySelectorAll('[data-metric]').forEach(el => {
+      const format = FORMATTERS[el.dataset.format] || FORMATTERS.int;
+      el.textContent = format(metrics[el.dataset.metric] ?? 0);
+    });
+  }
+
+  function renderPopulationBar(metrics) {
+    const widths = { barActive: metrics.active, barLost: metrics.lost, barNever: metrics.never };
+    Object.entries(widths).forEach(([id, value]) => {
+      document.getElementById(id).style.width = `${ratio(value, metrics.total) * 100}%`;
+    });
+  }
+
+  // ---------- Gráficos ----------
+  // Las cifras se escriben sobre las barras para que el dashboard se lea sin pasar el mouse.
+  const valueLabels = {
+    id: 'valueLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      const horizontal = chart.options.indexAxis === 'y';
+      chart.getDatasetMeta(0).data.forEach((bar, i) => {
+        ctx.save();
+        ctx.font = '600 12px Inter, sans-serif';
+        ctx.fillStyle = PALETTE.ink;
+        ctx.textAlign = horizontal ? 'left' : 'center';
+        ctx.textBaseline = horizontal ? 'middle' : 'bottom';
+        const text = FORMATTERS.pct(chart.data.datasets[0].data[i] / 100);
+        ctx.fillText(text, horizontal ? bar.x + 8 : bar.x, horizontal ? bar.y : bar.y - 6);
+        ctx.restore();
+      });
+    }
+  };
+
+  function chartOptions(horizontal) {
+    const valueAxis = { beginAtZero: true, grace: '18%', display: false };
+    const categoryAxis = { grid: { display: false }, border: { display: false },
+      ticks: { color: PALETTE.ink, font: { size: 12, weight: '500' } } };
+    return {
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700 },
+      layout: { padding: horizontal ? { left: 4, right: 44 } : { top: 8 } },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: horizontal ? { x: valueAxis, y: categoryAxis } : { x: categoryAxis, y: valueAxis }
+    };
+  }
+
+  function barChart(canvasId, labels, values, colors, horizontal) {
+    return new Chart(document.getElementById(canvasId), {
+      type: 'bar',
+      data: { labels, datasets: [{ data: values, backgroundColor: colors,
+        borderRadius: 6, maxBarThickness: horizontal ? 34 : 56 }] },
+      options: chartOptions(horizontal),
+      plugins: [valueLabels]
+    });
+  }
+
+  function renderDriversChart(rows) {
+    const values = driverShares(rows);
+    const top = Math.max(...values);
+    const colors = values.map(v => (v === top ? PALETTE.accent : PALETTE.neutral));
+    barChart('chartDrivers', DRIVERS.map(d => d.label), values, colors, true);
+  }
+
+  function renderAgeChart(rows, overallRetention) {
+    const values = retentionByAge(rows);
+    const benchmark = overallRetention * 100;
+    const colors = values.map(v => (v >= benchmark ? PALETTE.good : PALETTE.bad));
+    barChart('chartAge', AGE_GROUPS.map(g => g.label), values, colors, false);
+  }
+
+  // ---------- Arranque ----------
+  function init() {
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = PALETTE.muted;
+    const metrics = computeMetrics(SURVEY_DATA);
+    bindMetrics(metrics);
+    renderPopulationBar(metrics);
+    renderDriversChart(SURVEY_DATA);
+    renderAgeChart(SURVEY_DATA, metrics.retentionRate);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => document.fonts.ready.then(init));
+</script>
+</body>
+</html>
