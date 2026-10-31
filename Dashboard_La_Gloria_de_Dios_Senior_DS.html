@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Descubrimientos Multivariados · Tienda La Gloria de Dios</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            brand: {
+              primary: '#4F46E5',
+              surface: '#FFFFFF',
+              canvas: '#F8FAFC',
+              dark: '#0F172A',
+              muted: '#64748B',
+              coral: '#F43F5E',
+              coralLight: '#FFF1F2',
+              teal: '#0D9488',
+              tealLight: '#F0FDFA',
+              amber: '#D97706',
+              amberLight: '#FFFBEB'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+    .card-pro {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
+      transition: all 0.25s ease;
+    }
+    .card-pro:hover {
+      box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.06), 0 4px 8px -2px rgba(15, 23, 42, 0.03);
+      border-color: #CBD5E1;
+    }
+    .gradient-hero {
+      background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 60%, #312E81 100%);
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-indigo-600 selection:text-white min-h-screen flex flex-col justify-between">
+
+  <!-- HEADER LIMPIO Y PROFESIONAL -->
+  <header class="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+          GD
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-semibold tracking-wider uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-full">
+              Análisis del Consumidor
+            </span>
+            <span class="text-xs text-slate-400">· Conjunto Residencial Territorio Mío</span>
+          </div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+            Tienda «La Gloria de Dios»
+          </h1>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-lg">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Base cuantitativa: <strong>103 hogares encuestados</strong></span>
+        </div>
+        <a href="Dashboard_La_Gloria_de_Dios_Una_Vista.html"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-semibold tracking-wide shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98]">
+          <svg class="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Volver al Dashboard Principal</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-10 flex-1">
+
+    <!-- HERO NARRATIVO: EL FACTOR HUMANO -->
+    <section class="gradient-hero text-white rounded-3xl p-6 sm:p-9 shadow-lg relative overflow-hidden">
+      <div class="relative z-10 max-w-3xl space-y-3 sm:space-y-4">
+        <div class="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-indigo-300">
+          <span>5. Descubrimientos Multivariados </span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-snug">
+          ¿Por qué los vecinos dejaron de comprar? Las apariencias engañan.
+        </h2>
+        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+          Doña Gloria pensaba que sus clientes se iban únicamente por encontrar precios más económicos o por falta de lealtad al fiado. Sin embargo, al cruzar múltiples variables de comportamiento, hábitos de compra y dinámicas cotidianas, los datos revelan una realidad muy distinta: el <strong>86.4% de los vecinos la conoce</strong>, pero casi 9 de cada 10 clientes iniciales se han marchado a causa del <strong>tiempo de espera en mostrador</strong>, la <strong>incomodidad social de la libreta de fiado</strong> y la <strong>falta de porciones e ingredientes listos para el almuerzo</strong>.
+        </p>
+      </div>
+
+      <!-- Métricas contextuales limpias -->
+      <div class="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-left">
+        <div class="bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm">
+          <div class="text-2xl sm:text-3xl font-extrabold text-indigo-300 font-mono">80.0%</div>
+          <div class="text-xs text-slate-200 mt-1 font-semibold">Fuga de clientes de fiado</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">48 de 60 vecinos con crédito ya no vuelven a la tienda.</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm">
+          <div class="text-2xl sm:text-3xl font-extrabold text-teal-300 font-mono">65.6%</div>
+          <div class="text-xs text-slate-200 mt-1 font-semibold">Priorizan rapidez sobre precio</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">En el día a día, el tiempo de atención vence al ahorro.</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm">
+          <div class="text-2xl sm:text-3xl font-extrabold text-rose-300 font-mono">96.6%</div>
+          <div class="text-xs text-slate-200 mt-1 font-semibold">Deserción en mayores de 36 años</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Solo 2 hogares familiares se mantienen como clientes activos.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAS 4 HISTORIAS DETRÁS DE LOS DATOS (CARDS UX) -->
+    <section class="space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-1">
+        <div>
+          <span class="text-xs font-semibold text-indigo-600 tracking-wider uppercase">Historias del Día a Día</span>
+          <h3 class="text-xl font-bold text-slate-900">
+            Cuatro verdades que desmienten las creencias del negocio
+          </h3>
+        </div>
+        <p class="text-xs text-slate-500">Cruces de comportamiento basados en los 103 hogares encuestados</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- Tarjeta 1: Fiado -->
+        <article class="card-pro p-6 flex flex-col justify-between border-t-4 border-t-indigo-600">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[11px] font-semibold tracking-wide uppercase px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                Descubrimiento 1 · La Paradoja del Fiado
+              </span>
+              <span class="text-xs font-mono text-slate-400">P10 × P3</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-slate-900 mb-1">80.0%</div>
+            <h4 class="text-sm font-bold text-slate-800 mb-2">
+              El 80% de los vecinos que usan o valoran el fiado ya no compran en la tienda
+            </h4>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              El fiado parecía ser la principal herramienta de fidelización, pero en la práctica genera el efecto opuesto: <strong>la pena social</strong>. Cuando un vecino tiene un saldo anotado en la libreta y no tiene en el momento el dinero completo para cancelarlo, le da vergüenza entrar a comprar el pan o la leche del diario en efectivo sin abonar. Para evitar ese momento incómodo en el mostrador, prefiere caminar hasta las tiendas de las otras torres donde nadie le cobra.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-[11px] text-indigo-600 font-semibold">
+            <span>✦ 48 de 60 clientes de fiado están actualmente perdidos</span>
+          </div>
+        </article>
+
+        <!-- Tarjeta 2: Cercanía -->
+        <article class="card-pro p-6 flex flex-col justify-between border-t-4 border-t-teal-600">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[11px] font-semibold tracking-wide uppercase px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-100">
+                Descubrimiento 2 · El Mito de la Cercanía
+              </span>
+              <span class="text-xs font-mono text-slate-400">P1 × P3</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-slate-900 mb-1">64.0%</div>
+            <h4 class="text-sm font-bold text-slate-800 mb-2">
+              Casi dos tercios de los vecinos de su propio edificio (Torre 1) desertaron
+            </h4>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Estar en el primer piso de la Torre 1 no garantiza clientes cautivos. De 25 vecinos encuestados en su mismo bloque, 16 dejaron de comprar allí. Prefieren pasar de largo frente a su puerta, salir del edificio y caminar 50 metros hasta la Torre 2 o 3, antes que quedarse atrapados esperando 10 o 15 minutos mientras Doña Gloria despacha pedidos con lentitud o recibe proveedores en caja.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-[11px] text-teal-700 font-semibold">
+            <span>✦ Caminar unos pasos de más pesa menos que perder el tiempo en la fila</span>
+          </div>
+        </article>
+
+        <!-- Tarjeta 3: Precio vs Rapidez -->
+        <article class="card-pro p-6 flex flex-col justify-between border-t-4 border-t-amber-500">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[11px] font-semibold tracking-wide uppercase px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
+                Descubrimiento 3 · Lo que Dicen vs. Lo que Hacen
+              </span>
+              <span class="text-xs font-mono text-slate-400">P11 × P15</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-amber-600 mb-1">65.6%</div>
+            <h4 class="text-sm font-bold text-slate-800 mb-2">
+              Quienes afirman que el precio es vital, eligen su tienda por agilidad y buen trato
+            </h4>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Al ser consultados directamente sobre los precios, 64 personas afirmaron que el costo es determinante. Sin embargo, al cruzar esa respuesta con el factor con el que realmente deciden a dónde ir, <strong>42 de esas 64 personas (65.6%)</strong> terminan escogiendo la tienda que atiende rápido y con calidez. Cuando la comida está en el fogón o se va con prisa al trabajo, el tiempo vale mucho más que unos pocos pesos de diferencia.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-[11px] text-amber-700 font-semibold">
+            <span>✦ En compras cotidianas, la agilidad gana la partida al precio</span>
+          </div>
+        </article>
+
+        <!-- Tarjeta 4: Edad y Almuerzo -->
+        <article class="card-pro p-6 flex flex-col justify-between border-t-4 border-t-rose-500">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[11px] font-semibold tracking-wide uppercase px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-100">
+                Descubrimiento 4 · La Brecha de las Familias
+              </span>
+              <span class="text-xs font-mono text-slate-400">P2 × P3</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-rose-600 mb-1">3.4%</div>
+            <h4 class="text-sm font-bold text-slate-800 mb-2">
+              Apenas 2 de 58 vecinos mayores de 36 años siguen comprando en la tienda
+            </h4>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Existe una fractura generacional evidente. Los jóvenes (18-35) conservan cierta frecuencia porque bajan por compras individuales y puntuales (un refresco o un paquete de mecato). En cambio, los adultos y jefes de hogar mayores de 36 años compran la canasta del diario (papa, cebolla, tomate, leche). Pedir 6 ingredientes detrás de un mostrador desordenado toma demasiado tiempo, empujándolos a las góndolas ordenadas de las tiendas nuevas.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-[11px] text-rose-700 font-semibold">
+            <span>✦ Las compras del almuerzo familiar no toleran la lentitud de despacho</span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- VISUALIZACIONES MULTIVARIADAS (4 GRÁFICOS CLAROS Y ESPACIOSOS) -->
+    <section class="space-y-6">
+      <div>
+        <span class="text-xs font-semibold text-indigo-600 tracking-wider uppercase">Evidencia Gráfica Multivariada</span>
+        <h3 class="text-xl font-bold text-slate-900">
+          Cruces estadísticos que sustentan el diagnóstico
+        </h3>
+        <p class="text-xs text-slate-500 mt-0.5">Visualizaciones diseñadas para interpretar los patrones de comportamiento de un solo vistazo</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Gráfico 1: Edad vs Estado -->
+        <div class="card-pro p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h4 class="text-sm sm:text-base font-bold text-slate-900">
+                1. ¿Cómo influye la edad en la permanencia del cliente?
+              </h4>
+              <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">P2 × P3</span>
+            </div>
+            <p class="text-xs text-slate-500">
+              Distribución de clientes activos, desertores y personas que nunca compraron según su grupo de edad.
+            </p>
+          </div>
+
+          <div class="relative h-64 sm:h-72 my-4">
+            <canvas id="chartEdad"></canvas>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+            <span><strong>Conclusión:</strong> En mayores de 36 años, la deserción es de 47 personas frente a solo 2 activas.</span>
+          </div>
+        </div>
+
+        <!-- Gráfico 2: Torre vs Estado -->
+        <div class="card-pro p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h4 class="text-sm sm:text-base font-bold text-slate-900">
+                2. ¿La cercanía física protege a la tienda en su propio edificio?
+              </h4>
+              <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">P1 × P3</span>
+            </div>
+            <p class="text-xs text-slate-500">
+              Estado de los vecinos residentes en la Torre 1 (donde está el local) comparado con las demás torres.
+            </p>
+          </div>
+
+          <div class="relative h-64 sm:h-72 my-4">
+            <canvas id="chartTorre"></canvas>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+            <span><strong>Conclusión:</strong> 16 de los 25 vecinos de la Torre 1 prefieren salir a comprar a otras torres.</span>
+          </div>
+        </div>
+
+        <!-- Gráfico 3: P11 vs P15 Paradoja Precio vs Rapidez -->
+        <div class="card-pro p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h4 class="text-sm sm:text-base font-bold text-slate-900">
+                3. La paradoja de compra: Preocupación por precio vs. Elección real
+              </h4>
+              <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">P11 × P15</span>
+            </div>
+            <p class="text-xs text-slate-500">
+              Factor decisivo con el que eligen la tienda según el nivel de acuerdo con que «el precio es lo que más pesa».
+            </p>
+          </div>
+
+          <div class="relative h-64 sm:h-72 my-4">
+            <canvas id="chartParadox"></canvas>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+            <span><strong>Conclusión:</strong> De los 64 que dicen que el precio es lo que mas pesa, 42 de esos tambien eligieron por rapidez y trato amable.</span>
+          </div>
+        </div>
+
+        <!-- Gráfico 4: P10 vs P3 Fiado vs Deserción -->
+        <div class="card-pro p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h4 class="text-sm sm:text-base font-bold text-slate-900">
+                4. ¿Qué pasó con los vecinos que valoran el fiado?
+              </h4>
+              <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">P10 × P3</span>
+            </div>
+            <p class="text-xs text-slate-500">
+              Proporción de clientes según su grado de aprecio por el fiado y si continúan o no comprando en la tienda.
+            </p>
+          </div>
+
+          <div class="relative h-64 sm:h-72 my-4">
+            <canvas id="chartFiado"></canvas>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+            <span><strong>Conclusión:</strong> Aunque la tienda era flexible con el fiado, los vecinos prefieren hacer fila en las tiendas nuevas para comprar sus alimentos.</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RECOMENDACIONES HUMANAS Y ACCIONABLES -->
+    <section class="card-pro p-6 sm:p-8 bg-slate-900 text-white rounded-3xl space-y-6">
+      <div>
+        <span class="text-xs font-semibold tracking-wider uppercase text-teal-400">Plan de Acción</span>
+        <h3 class="text-xl sm:text-2xl font-bold text-white mt-1">
+          Soluciones Prácticas para Doña Gloria recupere sus clientes
+        </h3>
+        <p class="text-slate-300 text-xs sm:text-sm mt-1">
+          Soluciones prácticas enfocadas en resolver las fricciones cotidianas identificadas en los datos:
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-2.5">
+          <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-sm">
+            1
+          </div>
+          <h4 class="text-sm font-bold text-white">Proteger las horas pico del almuerzo</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Evitar a toda costa recibir camiones o proveedores entre las 11:30 y 1:30 p.m. Las familias cocinan con prisa y no pueden esperar a que la dueña verifique facturas mientras atiende el mostrador.
+          </p>
+        </div>
+
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-sm">
+            2
+          </div>
+          <h4 class="text-sm font-bold text-white">Bolsitas express de aliños e ingredientes</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Tener listos combos pesados y empaquetados de $2.000 o $3.000 (cebolla, tomate, cilantro). La vecina pide su bolsita, paga con su billete y se retira en 30 segundos, sin demoras ni filas.
+          </p>
+        </div>
+
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm">
+            3
+          </div>
+          <h4 class="text-sm font-bold text-white">Eliminar la incomodidad de la libreta</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Fijar fechas quincenales para pagos de fiado y garantizar que si un vecino entra a comprar lo del día en efectivo, no se le mencione la deuda pendiente en voz alta. Esto devuelve la tranquilidad al cliente.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PIE DE PÁGINA LIMPIO -->
+  <footer class="border-t border-slate-200 bg-white py-6 mt-12 text-center text-xs text-slate-400">
+    <div class="max-w-6xl mx-auto px-4">
+      <p>Estudio de Comportamiento del Consumidor · Tienda «La Gloria de Dios» · Muestra: n=103 hogares de Territorio Mío</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT DE CONFIGURACIÓN Y RENDERIZADO DE GRÁFICOS -->
+  <script>
+    // Paleta de diseño armoniosa y con excelente contraste
+    const UX_PALETTE = {
+      fuga: '#F43F5E',       // Rosa/Rojo suave para deserción
+      fugaSoft: 'rgba(244, 63, 94, 0.85)',
+      activo: '#0D9488',     // Teal cálido para retención activa
+      activoSoft: 'rgba(13, 148, 136, 0.85)',
+      nunca: '#94A3B8',      // Slate neutral para quienes nunca compraron
+      nuncaSoft: 'rgba(148, 163, 184, 0.65)',
+      rapidez: '#4F46E5',    // Índigo vibrante para rapidez y buen trato
+      precio: '#D97706',     // Ámbar para precios y fiado
+      orden: '#64748B'       // Slate para orden y limpieza
+    };
+
+    // Ajustes tipográficos de Chart.js
+    Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = '#475569';
+
+    // 1. GRÁFICO EDAD VS ESTADO (P2 × P3)
+    new Chart(document.getElementById('chartEdad'), {
+      type: 'bar',
+      data: {
+        labels: ['18 a 25 años', '26 a 35 años', '36 a 50 años', 'Más de 50 años'],
+        datasets: [
+          {
+            label: 'Dejaron de comprar (Deserción)',
+            data: [10, 22, 25, 22],
+            backgroundColor: UX_PALETTE.fuga,
+            borderRadius: 6
+          },
+          {
+            label: 'Compran actualmente',
+            data: [2, 6, 1, 1],
+            backgroundColor: UX_PALETTE.activo,
+            borderRadius: 6
+          },
+          {
+            label: 'Nunca han comprado',
+            data: [2, 3, 5, 4],
+            backgroundColor: UX_PALETTE.nunca,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true, grid: { display: false } },
+          y: { stacked: true, beginAtZero: true, grid: { color: '#F1F5F9' }, title: { display: true, text: 'Hogares' } }
+        },
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, usePointStyle: true, pointStyle: 'circle' } },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw} vecinos`
+            }
+          }
+        }
+      }
+    });
+
+    // 2. GRÁFICO TORRE VS ESTADO (P1 × P3)
+    new Chart(document.getElementById('chartTorre'), {
+      type: 'bar',
+      data: {
+        labels: ['Torre 1 (Edificio Propio)', 'Torre 2 (Con Tienda Nueva)', 'Torre 3 (Con Tienda Nueva)', 'Otras Torres'],
+        datasets: [
+          {
+            label: 'Dejaron de comprar',
+            data: [16, 31, 27, 5],
+            backgroundColor: UX_PALETTE.fuga,
+            borderRadius: 6
+          },
+          {
+            label: 'Compran actualmente',
+            data: [5, 2, 3, 0],
+            backgroundColor: UX_PALETTE.activo,
+            borderRadius: 6
+          },
+          {
+            label: 'Nunca han comprado',
+            data: [4, 3, 7, 0],
+            backgroundColor: UX_PALETTE.nunca,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true, grid: { display: false } },
+          y: { stacked: true, beginAtZero: true, grid: { color: '#F1F5F9' }, title: { display: true, text: 'Hogares' } }
+        },
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, usePointStyle: true, pointStyle: 'circle' } },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw} vecinos`
+            }
+          }
+        }
+      }
+    });
+
+    // 3. GRÁFICO PRECIO VS DECISIÓN REAL (P11 × P15)
+    new Chart(document.getElementById('chartParadox'), {
+      type: 'bar',
+      data: {
+        labels: [
+          'Dicen que el precio es lo que más pesa (64)',
+          'Opinión intermedia sobre el precio (26)',
+          'El precio no es lo determinante (13)'
+        ],
+        datasets: [
+          {
+            label: 'Eligen por: Trato y Rapidez de Atención',
+            data: [42, 14, 8],
+            backgroundColor: UX_PALETTE.rapidez,
+            borderRadius: 6
+          },
+          {
+            label: 'Eligen por: Precios y Fiado',
+            data: [12, 8, 3],
+            backgroundColor: UX_PALETTE.precio,
+            borderRadius: 6
+          },
+          {
+            label: 'Eligen por: Orden y Limpieza',
+            data: [10, 4, 2],
+            backgroundColor: UX_PALETTE.orden,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: '#F1F5F9' }, title: { display: true, text: "Clientes por  factor" } }
+        },
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, usePointStyle: true, pointStyle: 'circle' } },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw} hogares`
+            }
+          }
+        }
+      }
+    });
+
+    // 4. GRÁFICO FIADO VS ESTADO (P10 × P3)
+    new Chart(document.getElementById('chartFiado'), {
+      type: 'bar',
+      data: {
+        labels: [
+          'Agradecen y usan el Fiado (60)',
+          'Uso Regular o Neutral (25)',
+          'No usan Fiado (18)'
+        ],
+        datasets: [
+          {
+            label: 'Dejaron de comprar (Deserción)',
+            data: [48, 18, 13],
+            backgroundColor: UX_PALETTE.fuga,
+            borderRadius: 6
+          },
+          {
+            label: 'Compran actualmente',
+            data: [5, 3, 2],
+            backgroundColor: UX_PALETTE.activo,
+            borderRadius: 6
+          },
+          {
+            label: 'Nunca han comprado',
+            data: [7, 4, 3],
+            backgroundColor: UX_PALETTE.nunca,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true, grid: { display: false } },
+          y: { stacked: true, beginAtZero: true, grid: { color: '#F1F5F9' }, title: { display: true, text: 'Hogares' } }
+        },
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, usePointStyle: true, pointStyle: 'circle' } },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw} vecinos`
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
